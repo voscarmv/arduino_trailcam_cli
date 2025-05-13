@@ -109,11 +109,11 @@ The system uses an Arduino Uno and an HC-SR501 PIR motion sensor to detect movem
         ```
 
 4.  **Initial API Account Setup (if needed):**
-    The `signup.sh` script (which likely runs `node signup.js`) is used for creating an account on the backend API.
+    The `signup.js` script is used for creating an account on the backend API.
     ```bash
-    node signup.sh # Or as specified if it's a shell script directly
+    node signup.js # Or as specified if it's a shell script directly
     ```
-    *Note: This step might only be needed once or if you need to register this specific trail camera client as a user/device on the API.*
+    *Note: This step is needed once if you need to register this specific trail camera client as a user/device on the API.*
 
 5.  **Start the Listener:**
     Make the listener script executable and run it:
