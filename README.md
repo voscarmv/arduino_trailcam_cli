@@ -126,69 +126,9 @@ The system uses an Arduino Uno and an HC-SR501 PIR motion sensor to detect movem
 ## Scripts
 
 *   **`sketch_apr15a.ino`:** Arduino code for motion detection and serial communication.
-*   **`listener.sh` (Inferred Content - *You'll need to create or adapt this script*):**
-    ```bash
-    #!/bin/bash
-
-    # Source environment variables
-    if [ -f .env ]; then
-      export $(grep -v '^#' .env | xargs)
-    fi
-
-    SERIAL_PORT=${DEVICE_SERIAL_PORT:-/dev/ttyACM0} # Default if not in .env
-    WEBCAM_DEVICE=${WEBCAM_DEVICE:-/dev/video0}     # Default if not in .env
-    OUTPUT_DIR="./captures"
-    API_UPLOAD_SCRIPT="node upload.js" # Assuming upload.js handles the API interaction
-
-    mkdir -p "$OUTPUT_DIR"
-
-    echo "Listening on $SERIAL_PORT for motion..."
-
-    # Set stty to raw mode to read character by character
-    stty -F "$SERIAL_PORT" raw -echo
-
-    while true; do
-      # Read from serial port - this might need adjustment based on how Arduino sends data
-      # This example assumes Arduino sends a newline-terminated string "Movement detected"
-      if read -r line <"$SERIAL_PORT"; then
-        if [[ "$line" == "Movement detected"* ]]; then
-          echo "Motion Detected!"
-          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-          FILENAME="$OUTPUT_DIR/capture_$TIMESTAMP.jpg" # Or .mp4 for video
-
-          echo "Capturing image: $FILENAME"
-          # Example ffmpeg command for a still image - adjust parameters as needed
-          ffmpeg -i "$WEBCAM_DEVICE" -frames:v 1 -q:v 2 "$FILENAME" -y
-
-          # For video (e.g., 5 seconds):
-          # ffmpeg -i "$WEBCAM_DEVICE" -t 5 -c:v libx264 -preset ultrafast -crf 28 "$FILENAME.mp4" -y
-
-          if [ -f "$FILENAME" ]; then
-            echo "Uploading $FILENAME..."
-            $API_UPLOAD_SCRIPT "$FILENAME"
-            # Optionally, remove the file after successful upload
-            # rm "$FILENAME"
-          else
-            echo "Capture failed: $FILENAME not found."
-          fi
-
-          echo "Signaling Arduino to resume detection..."
-          # Send toggle byte '1' (ASCII for 1 is decimal 49)
-          # Check Arduino code for exact byte expected.
-          # If sketch expects a single char '1':
-          printf "1" > "$SERIAL_PORT"
-          # If sketch expects a numerical byte value 1:
-          # printf '\x01' > "$SERIAL_PORT"
-
-          echo "Waiting for next detection..."
-        fi
-      fi
-      sleep 0.1 # Small delay to prevent busy-waiting if no data
-    done
-    ```
-    *   **Important:** The `listener.sh` example above is a conceptual starting point. You'll need to tailor the `ffmpeg` command to your webcam and desired output (image vs. video, resolution, quality, duration). The serial communication part (`read` and `printf`) might also need adjustment based on how your Arduino sketch is precisely configured to send and receive data.
+*   **`listener.sh`:** The Arduino circuit signals this script which takes the picture and uploads it.
 *   **`signup.sh` / `signup.js` (Inferred):** A Node.js script to register/login this client device with the backend API.
-*   **`upload.js` (Inferred):** A Node.js script that takes a file path as an argument, authenticates with the API using credentials from `.env`, and uploads the file. It would use `node-fetch` and `form-data` as per `package.json`.
+*   **`upload.js`:** A Node.js script that takes a file path as an argument, authenticates with the API using credentials from `.env`, and uploads the file. It would use `node-fetch` and `form-data` as per `package.json`.
 
 ## Related Repositories
 
