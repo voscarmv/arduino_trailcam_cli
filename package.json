@@ -1,0 +1,17 @@
+{
+  "name": "arduino_trailcam",
+  "version": "1.0.0",
+  "description": "Combining Arduino Uno with a HC-SR501 motion sensor and a USB webcam in ffmpeg",
+  "main": "upload.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "form-data": "^4.0.2",
+    "gitignore": "^0.7.0",
+    "node-fetch": "^3.3.2"
+  }
+}
